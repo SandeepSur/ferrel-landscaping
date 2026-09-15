@@ -10,12 +10,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const mobileToggle = document.querySelector(".mobile-toggle");
     
     if (mobileToggle) {
-        mobileToggle.addEventListener("click", () => {
+        mobileToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
             navbar.classList.toggle("mobile-menu-open");
             // Change SVG icon to X when open
             if (navbar.classList.contains("mobile-menu-open")) {
                 mobileToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
             } else {
+                mobileToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+            }
+        });
+
+        // Close mobile menu when clicking any link inside the menu
+        const menuLinks = document.querySelectorAll(".nav-menu a");
+        menuLinks.forEach(link => {
+            link.addEventListener("click", () => {
+                if (navbar.classList.contains("mobile-menu-open")) {
+                    navbar.classList.remove("mobile-menu-open");
+                    mobileToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+                }
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener("click", (e) => {
+            if (navbar.classList.contains("mobile-menu-open") && !navbar.contains(e.target)) {
+                navbar.classList.remove("mobile-menu-open");
                 mobileToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
             }
         });
@@ -77,15 +97,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextBtn = document.getElementById("next-btn");
 
     if (track && prevBtn && nextBtn) {
-        // Scroll amount is card width (450px) + gap (30px)
-        const scrollAmount = 480;
+        const getScrollAmount = () => {
+            const firstCard = track.querySelector(".project-card");
+            if (firstCard) {
+                const style = window.getComputedStyle(track);
+                const gap = parseInt(style.gap) || 20;
+                return firstCard.offsetWidth + gap;
+            }
+            return 320;
+        };
 
         prevBtn.addEventListener("click", () => {
-            track.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+            track.scrollBy({ left: -getScrollAmount(), behavior: "smooth" });
         });
 
         nextBtn.addEventListener("click", () => {
-            track.scrollBy({ left: scrollAmount, behavior: "smooth" });
+            track.scrollBy({ left: getScrollAmount(), behavior: "smooth" });
         });
     }
 
